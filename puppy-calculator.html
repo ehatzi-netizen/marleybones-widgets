@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puppy Feeding Calculator — Marleybones</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #F5F0E8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+    }
+
+    .widget {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 2.25rem 2rem 2rem;
+      max-width: 580px;
+      width: 100%;
+      box-shadow: 0 2px 20px rgba(27, 77, 46, 0.09), 0 0 0 1px rgba(27, 77, 46, 0.04);
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #1B4D2E;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+
+    .subtitle {
+      margin-top: 0.45rem;
+      font-size: 0.88rem;
+      color: #7a9080;
+      line-height: 1.45;
+    }
+
+    /* ── Inputs ── */
+    .inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 1.85rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .input-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .input-label {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #1B4D2E;
+    }
+
+    .slider-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1B4D2E;
+      background: #F5F0E8;
+      border-radius: 20px;
+      padding: 0.22rem 0.7rem;
+      min-width: 72px;
+      text-align: center;
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #E4DDD0;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #1B4D2E;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(27, 77, 46, 0.35);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    input[type=range]::-moz-range-thumb {
+      width: 26px;
+      height: 26px;
+      border: none;
+      border-radius: 50%;
+      background: #1B4D2E;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(27, 77, 46, 0.35);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    input[type=range]:active::-webkit-slider-thumb {
+      transform: scale(1.18);
+      box-shadow: 0 3px 12px rgba(27, 77, 46, 0.45);
+    }
+
+    input[type=range]:active::-moz-range-thumb {
+      transform: scale(1.18);
+      box-shadow: 0 3px 12px rgba(27, 77, 46, 0.45);
+    }
+
+    .range-ticks {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+      font-size: 0.7rem;
+      color: #b0bdb5;
+      user-select: none;
+    }
+
+    /* ── Neutered toggle ── */
+    .toggle-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border-radius: 50px;
+      border: 2px solid #1B4D2E;
+      background: transparent;
+      color: #1B4D2E;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .toggle-btn.active {
+      background: #1B4D2E;
+      color: #ffffff;
+    }
+
+    .toggle-btn:not(.active):hover {
+      background: #F5F0E8;
+    }
+
+    /* ── Food selector ── */
+    .select-wrapper {
+      position: relative;
+    }
+
+    .select-wrapper::after {
+      content: '';
+      position: absolute;
+      right: 1.1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #1B4D2E;
+      pointer-events: none;
+    }
+
+    select {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      padding: 0.65rem 2.5rem 0.65rem 1.1rem;
+      border-radius: 50px;
+      border: 2px solid #E4DDD0;
+      background: #ffffff;
+      color: #1B4D2E;
+      font-size: 0.9rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    select:focus {
+      border-color: #1B4D2E;
+    }
+
+    /* ── Result card ── */
+    .result {
+      background: #F5F0E8;
+      border-radius: 18px;
+      padding: 1.5rem 1.25rem 1.4rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .result-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 0.35rem;
+      line-height: 1;
+    }
+
+    .result-grams {
+      font-size: 3rem;
+      font-weight: 800;
+      color: #1B4D2E;
+      letter-spacing: -0.03em;
+    }
+
+    .result-unit {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #4d7a5a;
+      align-self: flex-end;
+      padding-bottom: 0.3rem;
+    }
+
+    .result-sublabel {
+      font-size: 0.82rem;
+      color: #7a9080;
+      margin-top: 0.3rem;
+      margin-bottom: 1rem;
+    }
+
+    .packs-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #ffffff;
+      border-radius: 30px;
+      padding: 0.45rem 1rem;
+      font-size: 0.87rem;
+      color: #1B4D2E;
+      font-weight: 500;
+      box-shadow: 0 1px 4px rgba(27, 77, 46, 0.08);
+    }
+
+    .packs-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #1B4D2E;
+      flex-shrink: 0;
+    }
+
+    .transition-advice {
+      margin-top: 1rem;
+      padding: 0 0.25rem;
+      font-size: 0.82rem;
+      color: #4d7a5a;
+      line-height: 1.55;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: #EDE7DC;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── CTA ── */
+    .cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      background: #b8e0b0;
+      color: #1B4D2E;
+      font-weight: 700;
+      font-size: 0.97rem;
+      padding: 0.95rem 1.5rem;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: background 0.18s ease, transform 0.14s ease, box-shadow 0.18s ease;
+      letter-spacing: 0.005em;
+    }
+
+    .cta:hover {
+      background: #a5d9a0;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(27, 77, 46, 0.18);
+    }
+
+    .cta:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .cta-arrow {
+      font-size: 1.1rem;
+      transition: transform 0.18s;
+    }
+
+    .cta:hover .cta-arrow {
+      transform: translateX(3px);
+    }
+
+    .cta-note {
+      text-align: center;
+      font-size: 0.73rem;
+      color: #a8b5ae;
+      margin-top: 0.65rem;
+    }
+
+    /* ── Disclaimer ── */
+    .disclaimer {
+      margin-top: 1.25rem;
+      font-size: 0.72rem;
+      color: #b5bfba;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 400px) {
+      .widget { padding: 1.75rem 1.25rem 1.5rem; }
+      h1 { font-size: 1.25rem; }
+      .result-grams { font-size: 2.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="widget">
+
+  <div class="header">
+    <h1>Puppy Feeding Calculator</h1>
+    <p class="subtitle">See how much fresh food your puppy needs each&nbsp;day.</p>
+  </div>
+
+  <div class="inputs">
+
+    <div>
+      <div class="input-header">
+        <span class="input-label">Puppy's weight</span>
+        <span class="slider-value" id="weight-display">5 kg</span>
+      </div>
+      <input type="range" id="weight" min="1" max="15" value="5" step="0.5"
+             aria-label="Puppy weight in kilograms">
+      <div class="range-ticks">
+        <span>1 kg</span>
+        <span>5 kg</span>
+        <span>10 kg</span>
+        <span>15 kg</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="input-header">
+        <span class="input-label">Neutered / spayed?</span>
+      </div>
+      <div class="toggle-group">
+        <button class="toggle-btn active" id="neutered-yes" aria-pressed="true">Yes</button>
+        <button class="toggle-btn" id="neutered-no" aria-pressed="false">No</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="input-header">
+        <span class="input-label">What are they eating now?</span>
+      </div>
+      <div class="select-wrapper">
+        <select id="current-food" aria-label="Current food type">
+          <option value="" disabled selected>Select a food type…</option>
+          <option value="kibble">Dry kibble</option>
+          <option value="wet">Wet food</option>
+          <option value="raw">Raw food</option>
+          <option value="freeze-dried">Freeze dried</option>
+          <option value="cold-pressed">Cold pressed</option>
+          <option value="frozen">Frozen fresh food</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="result">
+    <div class="result-row">
+      <span class="result-grams" id="grams-display">—</span>
+      <span class="result-unit">g</span>
+    </div>
+    <p class="result-sublabel">per day</p>
+    <div class="packs-pill">
+      <span class="packs-dot"></span>
+      <span id="packs-display">around — packs a week</span>
+    </div>
+    <p class="transition-advice" id="transition-advice"></p>
+  </div>
+
+  <div class="divider"></div>
+
+  <a href="https://marleybones.com/pages/quiz" class="cta">
+    Get the exact plan for your puppy
+    <span class="cta-arrow">→</span>
+  </a>
+  <p class="cta-note">Takes 2 minutes &middot; Tailored to your breed &amp; lifestyle</p>
+
+  <p class="disclaimer">
+    Estimates are a guide only. Always transition to new food gradually
+    and consult your vet if you have any concerns.
+  </p>
+
+</div>
+
+<script>
+  // ── Marleybones feeding formula ──
+  // Step 1: RER       = 70 × weight^0.75
+  // Step 2: kcal/day  = RER × multiplier  (neutered/spayed: 1.44, intact: 1.8)
+  // Step 3: grams/day = kcal ÷ 1.282, rounded to nearest 5 g
+  // Step 4: packs/wk  = grams × 7 ÷ 390, rounded to nearest whole number
+
+  const TRANSITION_COPY = {
+    kibble:       'Switching from kibble? Start with 25% fresh mixed in and build up over 7–10 days.',
+    wet:          'Switching from wet food? The high moisture content means most dogs adapt to fresh quickly.',
+    raw:          'Already feeding raw? Fresh food offers the same quality philosophy — just safer to handle and store.',
+    'freeze-dried': 'Switching from freeze dried? You\'re already bought into quality ingredients — fresh food takes that further with higher moisture and better digestibility.',
+    'cold-pressed': 'Cold pressed is a good stepping stone — fresh food takes that philosophy further with higher moisture and less processing.',
+    frozen:       'Already on fresh? Pantry Fresh works the same way nutritionally, just no freezer needed.',
+    other:        'Every dog is different — the quiz builds a transition plan specific to your puppy.',
+  };
+
+  let neutered = true;
+
+  function calculate() {
+    const weight = parseFloat(weightSlider.value);
+    const food   = foodSelect.value;
+
+    weightDisplay.textContent = `${weight} kg`;
+
+    const rer        = 70 * Math.pow(weight, 0.75);
+    const multiplier = neutered ? 1.44 : 1.8;
+    const grams      = Math.round((rer * multiplier) / 1.282 / 5) * 5;
+    const packsWeek  = Math.round(grams * 7 / 390);
+
+    gramsDisplay.textContent     = grams;
+    packsDisplay.textContent     = `around ${packsWeek} ${packsWeek === 1 ? 'pack' : 'packs'} a week`;
+    transitionAdvice.textContent = TRANSITION_COPY[food] || '';
+
+    updateTrack(weightSlider);
+  }
+
+  function updateTrack(slider) {
+    const pct = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+    slider.style.background =
+      `linear-gradient(to right, #1B4D2E ${pct}%, #E4DDD0 ${pct}%)`;
+  }
+
+  // ── DOM refs ──
+  const weightSlider     = document.getElementById('weight');
+  const weightDisplay    = document.getElementById('weight-display');
+  const gramsDisplay     = document.getElementById('grams-display');
+  const packsDisplay     = document.getElementById('packs-display');
+  const transitionAdvice = document.getElementById('transition-advice');
+  const foodSelect       = document.getElementById('current-food');
+  const neuteredYes      = document.getElementById('neutered-yes');
+  const neuteredNo       = document.getElementById('neutered-no');
+
+  neuteredYes.addEventListener('click', () => {
+    neutered = true;
+    neuteredYes.classList.add('active');
+    neuteredYes.setAttribute('aria-pressed', 'true');
+    neuteredNo.classList.remove('active');
+    neuteredNo.setAttribute('aria-pressed', 'false');
+    calculate();
+  });
+
+  neuteredNo.addEventListener('click', () => {
+    neutered = false;
+    neuteredNo.classList.add('active');
+    neuteredNo.setAttribute('aria-pressed', 'true');
+    neuteredYes.classList.remove('active');
+    neuteredYes.setAttribute('aria-pressed', 'false');
+    calculate();
+  });
+
+  weightSlider.addEventListener('input', calculate);
+  foodSelect.addEventListener('change', calculate);
+
+  calculate();
+</script>
+
+</body>
+</html>

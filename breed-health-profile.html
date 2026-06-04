@@ -6,7 +6,7 @@
   <title>Breed Food Finder — Marleybones</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
       background: transparent;
@@ -16,7 +16,7 @@
       padding: 1.25rem;
       overflow-x: hidden;
     }
-
+ 
     .widget {
       background: #ffffff;
       border-radius: 24px;
@@ -25,13 +25,12 @@
       width: 100%;
       box-shadow: 0 2px 20px rgba(27, 77, 46, 0.09), 0 0 0 1px rgba(27, 77, 46, 0.04);
     }
-
-    /* ── Form header (visible in form state only) ── */
+ 
     .form-header {
       text-align: center;
       margin-bottom: 1.75rem;
     }
-
+ 
     h1 {
       font-size: 1.4rem;
       font-weight: 800;
@@ -39,25 +38,24 @@
       line-height: 1.2;
       letter-spacing: -0.01em;
     }
-
+ 
     .subtitle {
       margin-top: 0.5rem;
       font-size: 0.88rem;
       color: #7a9080;
       line-height: 1.5;
     }
-
-    /* ── Form state ── */
+ 
     .form-state { display: block; }
     .form-state.hidden { display: none; }
-
+ 
     .inputs {
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
       margin-bottom: 1.6rem;
     }
-
+ 
     .input-label {
       display: block;
       font-size: 0.92rem;
@@ -65,16 +63,16 @@
       color: #1B4D2E;
       margin-bottom: 0.7rem;
     }
-
+ 
     .input-hint {
       font-size: 0.78rem;
       color: #9aaa9e;
       font-weight: 400;
       margin-left: 0.4rem;
     }
-
+ 
     .pill-group { display: flex; flex-wrap: wrap; gap: 0.45rem; }
-
+ 
     .pill-btn {
       padding: 0.52rem 1rem;
       border-radius: 50px;
@@ -89,10 +87,10 @@
       white-space: nowrap;
       line-height: 1;
     }
-
+ 
     .pill-btn:hover { border-color: #1B4D2E; color: #1B4D2E; }
     .pill-btn.active { background: #1B4D2E; border-color: #1B4D2E; color: #ffffff; }
-
+ 
     .generate-btn {
       width: 100%;
       padding: 1rem 1.5rem;
@@ -107,20 +105,19 @@
       transition: background 0.15s ease, transform 0.14s ease, box-shadow 0.18s ease, opacity 0.15s ease;
       letter-spacing: 0.005em;
     }
-
+ 
     .generate-btn:hover:not(:disabled) {
       background: #163d24;
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(27, 77, 46, 0.22);
     }
-
+ 
     .generate-btn:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
     .generate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    /* ── Result state ── */
+ 
     .result-state { display: none; }
     .result-state.visible { display: block; }
-
+ 
     .result-card {
       background: #F5F0E8;
       border-radius: 18px;
@@ -131,7 +128,7 @@
       flex-direction: column;
       justify-content: center;
     }
-
+ 
     .result-eyebrow {
       font-size: 0.72rem;
       font-weight: 700;
@@ -140,19 +137,19 @@
       letter-spacing: 0.08em;
       margin-bottom: 0.6rem;
     }
-
+ 
     .result-text {
       font-size: 0.97rem;
       color: #1a3326;
       line-height: 1.75;
     }
-
+ 
     .loading-inner {
       display: none;
       text-align: center;
       padding: 0.5rem 0;
     }
-
+ 
     .loading-inner.visible { display: block; }
     .loading-text { font-size: 0.88rem; color: #7a9080; margin-bottom: 0.7rem; }
     .loading-dots { display: inline-flex; gap: 5px; }
@@ -163,12 +160,12 @@
     }
     .loading-dots span:nth-child(2) { animation-delay: 0.18s; }
     .loading-dots span:nth-child(3) { animation-delay: 0.36s; }
-
+ 
     @keyframes bounce {
       0%, 80%, 100% { transform: translateY(0); }
       40% { transform: translateY(-8px); }
     }
-
+ 
     .cta {
       display: flex;
       align-items: center;
@@ -185,19 +182,19 @@
       letter-spacing: 0.005em;
       margin-bottom: 0.65rem;
     }
-
+ 
     .cta:hover {
       background: #a5d9a0;
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(27, 77, 46, 0.18);
     }
-
+ 
     .cta:active { transform: translateY(0); box-shadow: none; }
     .cta-arrow { font-size: 1.1rem; transition: transform 0.18s; }
     .cta:hover .cta-arrow { transform: translateX(3px); }
-
+ 
     .cta-note { text-align: center; font-size: 0.73rem; color: #a8b5ae; }
-
+ 
     .result-reset {
       display: block;
       text-align: center;
@@ -213,7 +210,7 @@
       width: 100%;
     }
     .result-reset:hover { color: #1B4D2E; }
-
+ 
     .error {
       display: none;
       background: #fff8f8;
@@ -226,15 +223,7 @@
       line-height: 1.5;
     }
     .error.visible { display: block; }
-
-    .disclaimer {
-      margin-top: 1rem;
-      font-size: 0.72rem;
-      color: #b5bfba;
-      text-align: center;
-      line-height: 1.5;
-    }
-
+ 
     @media (max-width: 400px) {
       .widget { padding: 1.75rem 1.1rem 1.5rem; }
       h1 { font-size: 1.2rem; }
@@ -243,18 +232,15 @@
   </style>
 </head>
 <body>
-
+ 
 <div class="widget">
-
-  <!-- FORM STATE -->
+ 
   <div class="form-state" id="form-state">
-
-    <!-- Header: no breed tag pill, just heading + subtitle -->
     <div class="form-header">
       <h1 id="widget-title">Is fresh food right for your Cockapoo?</h1>
       <p class="subtitle">Tell us a bit about your dog to find out.</p>
     </div>
-
+ 
     <div class="inputs">
       <div>
         <span class="input-label">
@@ -270,7 +256,7 @@
           <button class="pill-btn" data-group="concern" data-value="no specific concerns">None right now</button>
         </div>
       </div>
-
+ 
       <div>
         <span class="input-label">What are they eating now?</span>
         <div class="pill-group">
@@ -282,16 +268,13 @@
         </div>
       </div>
     </div>
-
+ 
     <button class="generate-btn" id="generate-btn" disabled onclick="generateProfile()">
       Find the right food for your Cockapoo →
     </button>
-
   </div>
-
-  <!-- RESULT STATE: no header, no subtitle -->
+ 
   <div class="result-state" id="result-state">
-
     <div class="result-card" id="result-card">
       <div class="loading-inner" id="loading-inner">
         <p class="loading-text">Finding your recommendation</p>
@@ -300,44 +283,41 @@
       <p class="result-eyebrow" id="result-eyebrow">Your Cockapoo's profile</p>
       <p class="result-text" id="result-text"></p>
     </div>
-
+ 
     <div class="error" id="error">
       Something went wrong — please try again in a moment.
     </div>
-
+ 
     <a href="https://marleybones.com/pages/quiz?utm_source=widget&utm_medium=breed-health-profile&utm_campaign=cro-widgets"
        class="cta" target="_top">
       Create your personalised feeding plan
       <span class="cta-arrow">→</span>
     </a>
     <p class="cta-note" id="cta-note">Takes 2 minutes · Tailored to your Cockapoo</p>
-
+ 
     <button class="result-reset" onclick="resetWidget()">Start again</button>
-
   </div>
-
-
-
+ 
 </div>
-
+ 
 <script>
   const params   = new URLSearchParams(window.location.search);
   const rawBreed = params.get('breed') || 'Cockapoo';
   const breed    = rawBreed.charAt(0).toUpperCase() + rawBreed.slice(1);
-
+ 
   document.getElementById('widget-title').textContent   = `Is fresh food right for your ${breed}?`;
   document.getElementById('result-eyebrow').textContent = `Your ${breed}'s profile`;
   document.getElementById('generate-btn').textContent   = `Find the right food for your ${breed} \u2192`;
   document.getElementById('cta-note').textContent       = `Takes 2 minutes \u00b7 Tailored to your ${breed}`;
-
+ 
   const concerns = new Set();
   let food = null;
-
+ 
   document.querySelectorAll('.pill-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const group = btn.dataset.group;
       const val   = btn.dataset.value;
-
+ 
       if (group === 'concern') {
         if (val === 'no specific concerns') {
           concerns.clear();
@@ -363,11 +343,11 @@
         btn.classList.add('active');
         food = val;
       }
-
+ 
       document.getElementById('generate-btn').disabled = !(concerns.size > 0 && food);
     });
   });
-
+ 
   async function generateProfile() {
     document.getElementById('form-state').classList.add('hidden');
     document.getElementById('result-state').classList.add('visible');
@@ -375,13 +355,13 @@
     document.getElementById('result-eyebrow').style.display = 'none';
     document.getElementById('result-text').style.display = 'none';
     hide('error');
-
+ 
     const concernList = [...concerns].join(' and ');
-
-    const systemPrompt = `You are a dog nutrition expert explaining something to a friend — confident and clear, but not clinical or salesy. Think of how a vet friend would explain something at a dinner party: direct, specific, no jargon, no waffle.\n\nThe person has already read that fresh dog food is generally better than kibble. They want to know if it is specifically right for their dog. Your job is to give them a clear, honest reason why fresh food makes sense for this particular breed given their situation, and why Marleybones specifically delivers that.\n\nRules:\n- Write exactly 3 sentences. No more, no fewer.\n- HARD LIMIT: Your total response must be between 300 and 450 characters including spaces. This is non-negotiable. Count your characters before you finish. If you are over 450, rewrite and shorten until you are under. If you are under 300, add one specific breed detail to reach it. Do not submit a response outside this range under any circumstances.\n- Each sentence must be under 120 characters. This is a hard limit. Count each sentence individually. If a sentence exceeds 120 characters, rewrite it shorter or split it into two. Long sentences are not acceptable.\n- Lead immediately with why fresh food helps for this breed and these concerns. Do not open with the problem — open with the benefit or the reason it works.\n- Be specific to this breed's known health tendencies. Avoid generic claims that apply to any dog.\n- Confident and clear in tone — not casual, not clinical, not salesy.\n- No marketing language, no superlatives, no stats, no exclamation marks.\n- Every response must conclude by explaining why Marleybones specifically suits this breed and situation. This is mandatory, not optional. The final sentence or the second half of the final sentence must explain what Marleybones does that is directly relevant to this dog — not as a recommendation or a sales close, but as a natural conclusion to what came before. If your response does not contain the word Marleybones, rewrite it until it does. Never phrase it as a suggestion to check it out, explore it, or that it is worth a look.\n- The Marleybones fact must be relevant to what they are currently feeding. Use this mapping: kibble means the contrast is real ingredients versus processed meal, real meat slow-cooked rather than extruded at high heat; wet food means ingredient quality and no fillers or bulking agents; raw means consistent nutrient profile because it is vet-developed and FEDIAF compliant, food safety, no handling complexity, no prep or freezer needed — do not claim it is simpler or more digestible than raw; frozen fresh means same principle as what they are already feeding but shelf-stable with no freezer needed; mixed means consistency of ingredients, knowing exactly what is in every meal. Never mention shelf-stable or no freezer to someone who is not on frozen fresh — it is irrelevant to them.\n\nConcern-specific guidance:\n\nFUSSY EATING: The reason fresh food works for fussy dogs is palatability — it smells and tastes like real food in a way that processed food does not. Lead with this. Explain that the aroma and taste of real meat and vegetables is what makes the difference for dogs that turn their nose up at processed food.\n\nSENSITIVE STOMACH: Fresh food removes the fillers, binding agents, and heavily processed ingredients that are common triggers. Mention the breed's specific digestive tendencies if known. Explain that simpler, more digestible ingredients reduce the load on the gut.\n\nITCHY SKIN OR ALLERGIES: The mechanism is ingredient transparency — fresh food makes it easier to identify and rotate proteins, avoiding common triggers. Many skin reactions in dogs are food-related and linked to additives or low-quality protein sources in processed food.\n\nFROZEN FRESH: Acknowledge they are already in the right place nutritionally. Explain that Pantry Fresh works on the same principle but is shelf-stable with no freezer needed. This is the most natural context to mention the no-freezer benefit.\n\nJOINT HEALTH: Fresh food with natural anti-inflammatory ingredients supports joint health better than processed food. Mention the breed's known joint tendencies if relevant.\n\nWEIGHT MANAGEMENT: Fresh food has better moisture content and more accurate traceable calorie density than kibble, making portion control more straightforward.\n\nRAW: Raw feeders have already committed to real ingredients and quality protein — do not claim fresh food is simpler or more digestible than raw as this is not accurate and will lose credibility. The relevant Marleybones angle is consistent nutrient profile because it is vet-developed and FEDIAF compliant, food safety, no handling complexity, and no prep or freezer needed. Do not overclaim.`;
-
-    const userPrompt = `Breed: ${breed}\nHealth concern(s): ${concernList}\nCurrently eating: ${food}\n\nWrite exactly 3 sentences. Count your characters. Total must be 300 to 450 characters — hard limit, no exceptions. Lead with the benefit. Be specific to the breed. Your response must contain the word Marleybones`;
-
+ 
+    const systemPrompt = `You are a dog nutrition expert explaining something to a friend — confident and clear, but not clinical or salesy. Think of how a vet friend would explain something at a dinner party: direct, specific, no jargon, no waffle.\n\nThe person has already read that fresh dog food is generally better than kibble. They want to know if it is specifically right for their dog. Your job is to give them a clear, honest reason why fresh food makes sense for this particular breed given their situation, and why Marleybones specifically delivers that.\n\nRules:\n- Write exactly 3 sentences. No more, no fewer.\n- Each sentence must be 140 characters or under. This is a hard limit — count each sentence before finishing. If any sentence exceeds 140 characters, rewrite it until it does not.\n- There is no minimum length. Do not pad sentences.\n- Lead immediately with why fresh food helps for this breed and these concerns. Do not open with the problem — open with the benefit or the reason it works.\n- Be specific to this breed's known health tendencies. Avoid generic claims that apply to any dog.\n- Confident and clear in tone — not casual, not clinical, not salesy.\n- No marketing language, no superlatives, no stats, no exclamation marks.\n- Every response must conclude by explaining why Marleybones specifically suits this breed and situation. This is mandatory, not optional. The final sentence or the second half of the final sentence must explain what Marleybones does that is directly relevant to this dog — not as a recommendation or a sales close, but as a natural conclusion to what came before. If your response does not contain the word Marleybones, rewrite it until it does. Never phrase it as a suggestion to check it out, explore it, or that it is worth a look.\n- The Marleybones fact must be relevant to what they are currently feeding. Use this mapping: kibble means the contrast is real ingredients versus processed meal, real meat slow-cooked rather than extruded at high heat; wet food means ingredient quality and no fillers or bulking agents; raw means consistent nutrient profile because it is vet-developed and FEDIAF compliant, food safety, no handling complexity, no prep or freezer needed — do not claim it is simpler or more digestible than raw; frozen fresh means same principle as what they are already feeding but shelf-stable with no freezer needed; mixed means consistency of ingredients, knowing exactly what is in every meal. Never mention shelf-stable or no freezer to someone who is not on frozen fresh — it is irrelevant to them.\n\nConcern-specific guidance:\n\nFUSSY EATING: The reason fresh food works for fussy dogs is palatability — it smells and tastes like real food in a way that processed food does not. Lead with this. Explain that the aroma and taste of real meat and vegetables is what makes the difference for dogs that turn their nose up at processed food.\n\nSENSITIVE STOMACH: Fresh food removes the fillers, binding agents, and heavily processed ingredients that are common triggers. Mention the breed's specific digestive tendencies if known. Explain that simpler, more digestible ingredients reduce the load on the gut.\n\nITCHY SKIN OR ALLERGIES: The mechanism is ingredient transparency — fresh food makes it easier to identify and rotate proteins, avoiding common triggers. Many skin reactions in dogs are food-related and linked to additives or low-quality protein sources in processed food.\n\nFROZEN FRESH: Acknowledge they are already in the right place nutritionally. Explain that Pantry Fresh works on the same principle but is shelf-stable with no freezer needed. This is the most natural context to mention the no-freezer benefit.\n\nJOINT HEALTH: Fresh food with natural anti-inflammatory ingredients supports joint health better than processed food. Mention the breed's known joint tendencies if relevant.\n\nWEIGHT MANAGEMENT: Fresh food has better moisture content and more accurate traceable calorie density than kibble, making portion control more straightforward.\n\nRAW: Raw feeders have already committed to real ingredients and quality protein — do not claim fresh food is simpler or more digestible than raw as this is not accurate and will lose credibility. The relevant Marleybones angle is consistent nutrient profile because it is vet-developed and FEDIAF compliant, food safety, no handling complexity, and no prep or freezer needed. Do not overclaim.`;
+ 
+    const userPrompt = `Breed: ${breed}\nHealth concern(s): ${concernList}\nCurrently eating: ${food}\n\nWrite exactly 3 sentences, each under 140 characters. Your response must contain the word Marleybones. Lead with the benefit. Be specific to the breed.`;
+ 
     try {
       const res = await fetch('https://marleybones-widget-proxy.ehatzi.workers.dev', {
         method: 'POST',
@@ -391,37 +371,36 @@
           messages: [{ role: 'user', content: userPrompt }]
         })
       });
-
+ 
       if (!res.ok) throw new Error(res.status);
-
+ 
       const data = await res.json();
       let text = data.content
         .filter(b => b.type === 'text')
         .map(b => b.text)
         .join(' ')
         .trim();
-
+ 
       const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-      // Trim at last sentence boundary under 450 chars
       let trimmed = '';
       for (const s of sentences) {
         if ((trimmed + s).length <= 500) trimmed += s;
         else break;
       }
       text = (trimmed || sentences[0]).trim();
-
+ 
       document.getElementById('loading-inner').classList.remove('visible');
       document.getElementById('result-eyebrow').style.display = '';
       document.getElementById('result-text').style.display = '';
       document.getElementById('result-text').textContent = text;
-
+ 
     } catch (err) {
       console.error(err);
       document.getElementById('loading-inner').classList.remove('visible');
       show('error');
     }
   }
-
+ 
   function resetWidget() {
     concerns.clear();
     food = null;
@@ -432,10 +411,11 @@
     document.getElementById('form-state').classList.remove('hidden');
     hide('error');
   }
-
+ 
   function show(id) { document.getElementById(id).classList.add('visible'); }
   function hide(id) { document.getElementById(id).classList.remove('visible'); }
 </script>
-
+ 
 </body>
 </html>
+ 

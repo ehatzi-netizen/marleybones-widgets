@@ -9,10 +9,9 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      background: #F5F0E8;
-      min-height: 100vh;
+      background: transparent;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
       padding: 1.25rem;
       overflow-x: hidden;
@@ -26,6 +25,10 @@
       width: 100%;
       box-shadow: 0 2px 20px rgba(27, 77, 46, 0.09), 0 0 0 1px rgba(27, 77, 46, 0.04);
     }
+
+    /* ── Form state ── */
+    .form-state { display: block; }
+    .form-state.hidden { display: none; }
 
     .header { text-align: center; margin-bottom: 1.75rem; }
 
@@ -77,12 +80,7 @@
     }
 
     .pill-btn:hover { border-color: #1B4D2E; color: #1B4D2E; }
-
-    .pill-btn.active {
-      background: #1B4D2E;
-      border-color: #1B4D2E;
-      color: #ffffff;
-    }
+    .pill-btn.active { background: #1B4D2E; border-color: #1B4D2E; color: #ffffff; }
 
     .generate-btn {
       width: 100%;
@@ -97,7 +95,6 @@
       cursor: pointer;
       transition: background 0.15s ease, transform 0.14s ease, box-shadow 0.18s ease, opacity 0.15s ease;
       letter-spacing: 0.005em;
-      margin-bottom: 1.5rem;
     }
 
     .generate-btn:hover:not(:disabled) {
@@ -109,16 +106,19 @@
     .generate-btn:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
     .generate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    #form-state.hidden { display: none; }
-
-    .result { display: none; margin-bottom: 1.5rem; }
-    .result.visible { display: block; }
+    /* ── Result state ── */
+    .result-state { display: none; }
+    .result-state.visible { display: block; }
 
     .result-card {
       background: #F5F0E8;
       border-radius: 18px;
       padding: 1.4rem 1.3rem 1.25rem;
-      margin-bottom: 0.75rem;
+      margin-bottom: 1.6rem;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .result-eyebrow {
@@ -137,16 +137,18 @@
     }
 
     .result-reset {
-      display: inline-block;
+      display: block;
+      text-align: center;
       font-size: 0.77rem;
       color: #9aaa9e;
       cursor: pointer;
       background: none;
       border: none;
       font-family: inherit;
-      padding: 0;
+      padding: 0.65rem 0 0;
       text-decoration: underline;
       text-underline-offset: 2px;
+      width: 100%;
     }
     .result-reset:hover { color: #1B4D2E; }
 
@@ -180,14 +182,6 @@
 
     .cta-note { text-align: center; font-size: 0.73rem; color: #a8b5ae; margin-top: 0.65rem; }
 
-    .disclaimer {
-      margin-top: 1.25rem;
-      font-size: 0.72rem;
-      color: #b5bfba;
-      text-align: center;
-      line-height: 1.5;
-    }
-
     @media (max-width: 400px) {
       .widget { padding: 1.75rem 1.1rem 1.5rem; }
       h1 { font-size: 1.2rem; }
@@ -199,14 +193,14 @@
 
 <div class="widget">
 
-  <div id="form-state">
+  <!-- FORM STATE -->
+  <div class="form-state" id="form-state">
     <div class="header">
       <h1>Find the right food for your dog's gut</h1>
       <p class="subtitle">Tell us a bit about your dog to find out.</p>
     </div>
 
     <div class="inputs">
-
       <div>
         <span class="input-label">What do you feed them?</span>
         <div class="pill-group">
@@ -235,7 +229,6 @@
           <button class="pill-btn" data-group="age" data-value="senior">Senior</button>
         </div>
       </div>
-
     </div>
 
     <button class="generate-btn" id="generate-btn" disabled onclick="generateResult()">
@@ -243,26 +236,24 @@
     </button>
   </div>
 
-  <div class="result" id="result">
+  <!-- RESULT STATE -->
+  <div class="result-state" id="result-state">
     <div class="result-card">
       <p class="result-eyebrow">Your dog's gut profile</p>
       <p class="result-text" id="result-text"></p>
     </div>
+
     <button class="result-reset" onclick="resetWidget()">Start again</button>
+
+    <div class="divider" style="margin-top: 1.5rem;"></div>
+
+    <a href="https://marleybones.com/pages/quiz?utm_source=widget&utm_medium=gut-health-checker&utm_campaign=cro-widgets"
+       class="cta" target="_top">
+      Build your complete feeding and health plan
+      <span class="cta-arrow">→</span>
+    </a>
+    <p class="cta-note">Takes 2 minutes · Tailored to your dog</p>
   </div>
-
-  <div class="divider"></div>
-
-  <a href="https://marleybones.com/pages/quiz?utm_source=widget&utm_medium=gut-health-checker&utm_campaign=cro-widgets"
-     class="cta" target="_top">
-    Create your personalised feeding and health plan
-    <span class="cta-arrow">→</span>
-  </a>
-  <p class="cta-note">Takes 2 minutes · Tailored to your dog</p>
-
-  <p class="disclaimer">
-    This is a general guide only. Always consult your vet for specific health concerns.
-  </p>
 
 </div>
 
@@ -403,19 +394,16 @@
 
     document.getElementById('result-text').textContent = sentences.join(' ');
     document.getElementById('form-state').classList.add('hidden');
-    show('result');
+    document.getElementById('result-state').classList.add('visible');
   }
 
   function resetWidget() {
     food = null; frequency = null; age = null;
     document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('generate-btn').disabled = true;
-    hide('result');
+    document.getElementById('result-state').classList.remove('visible');
     document.getElementById('form-state').classList.remove('hidden');
   }
-
-  function show(id) { document.getElementById(id).classList.add('visible'); }
-  function hide(id) { document.getElementById(id).classList.remove('visible'); }
 </script>
 
 </body>

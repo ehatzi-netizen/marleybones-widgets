@@ -355,9 +355,21 @@
     }
   };
 
-  const AGE_MODIFIERS = {
-    puppy:  "Puppies have developing gut microbiomes and are more vulnerable — getting the diet right early makes a real difference.",
-    senior: "Senior dogs have less gut resilience, so recurring digestive issues are worth addressing sooner rather than later."
+  cnst AGE_MODIFIERS = {
+    puppy: {
+      kibble:  "Puppies have developing guts that are especially sensitive to fillers — fresh food like Marleybones is gentler and easier to digest from the start.",
+      wet:     "Puppies are more vulnerable to gut irritants in low-quality wet food — Marleybones uses simple, clean ingredients that are kinder to a developing gut.",
+      raw:     "Puppies have developing gut microbiomes — Marleybones Pantry Fresh uses the same whole-food approach as raw but gently cooked, which suits young guts well.",
+      frozen:  "Puppies benefit from consistency in their diet — Marleybones works on the same principle as frozen fresh but shelf-stable, making it easy to keep on hand.",
+      mixed:   "Puppies do better on a consistent diet than a varied one — Marleybones keeps the recipe simple and stable, which supports a developing gut."
+    },
+    senior: {
+      kibble:  "Senior dogs have less gut resilience — switching to fresh food like Marleybones, with no fillers or heavy processing, is worth doing sooner rather than later.",
+      wet:     "Senior dogs are more vulnerable to gut irritants in low-quality wet food — Marleybones uses simple, traceable ingredients that are easier on an ageing gut.",
+      raw:     "Senior dogs sometimes do better on gently cooked food than raw — Marleybones uses the same whole-food philosophy but cooked, which suits older guts well.",
+      frozen:  "Senior dogs benefit from dietary consistency — Marleybones works on the same principle as frozen fresh but shelf-stable, with no handling complexity.",
+      mixed:   "Senior dogs have less gut resilience and do better on a consistent, simple diet — Marleybones is built around exactly that, with nothing processed or hidden."
+    }
   };
 
   let food      = null;
@@ -387,7 +399,7 @@
 
   function generateResult() {
     const sentences = [...RESPONSES[food][frequency]];
-    if (age !== 'adult') sentences[2] = AGE_MODIFIERS[age];
+    if (age !== 'adult') sentences[2] = AGE_MODIFIERS[age][food];
 
     document.getElementById('result-text').textContent = sentences.join(' ');
     document.getElementById('form-state').classList.add('hidden');

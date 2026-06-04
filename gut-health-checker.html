@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gut Health Checker — Marleybones</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #F5F0E8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      overflow-x: hidden;
+    }
+
+    .widget {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 2.25rem 2rem 2rem;
+      max-width: 580px;
+      width: 100%;
+      box-shadow: 0 2px 20px rgba(27, 77, 46, 0.09), 0 0 0 1px rgba(27, 77, 46, 0.04);
+    }
+
+    .header { text-align: center; margin-bottom: 1.75rem; }
+
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #1B4D2E;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+
+    .subtitle {
+      margin-top: 0.5rem;
+      font-size: 0.88rem;
+      color: #7a9080;
+      line-height: 1.5;
+    }
+
+    .inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-bottom: 1.6rem;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #1B4D2E;
+      margin-bottom: 0.7rem;
+    }
+
+    .pill-group { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+
+    .pill-btn {
+      padding: 0.52rem 1rem;
+      border-radius: 50px;
+      border: 2px solid #D8D0C4;
+      background: #ffffff;
+      color: #4a6555;
+      font-size: 0.875rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+      white-space: nowrap;
+      line-height: 1;
+    }
+
+    .pill-btn:hover { border-color: #1B4D2E; color: #1B4D2E; }
+
+    .pill-btn.active {
+      background: #1B4D2E;
+      border-color: #1B4D2E;
+      color: #ffffff;
+    }
+
+    .generate-btn {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border-radius: 50px;
+      border: none;
+      background: #1B4D2E;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.14s ease, box-shadow 0.18s ease, opacity 0.15s ease;
+      letter-spacing: 0.005em;
+      margin-bottom: 1.5rem;
+    }
+
+    .generate-btn:hover:not(:disabled) {
+      background: #163d24;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(27, 77, 46, 0.22);
+    }
+
+    .generate-btn:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
+    .generate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    #form-state.hidden { display: none; }
+
+    .result { display: none; margin-bottom: 1.5rem; }
+    .result.visible { display: block; }
+
+    .result-card {
+      background: #F5F0E8;
+      border-radius: 18px;
+      padding: 1.4rem 1.3rem 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .result-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #7a9080;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.6rem;
+    }
+
+    .result-text {
+      font-size: 0.97rem;
+      color: #1a3326;
+      line-height: 1.75;
+    }
+
+    .result-reset {
+      display: inline-block;
+      font-size: 0.77rem;
+      color: #9aaa9e;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .result-reset:hover { color: #1B4D2E; }
+
+    .divider { height: 1px; background: #EDE7DC; margin-bottom: 1.5rem; }
+
+    .cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      background: #b8e0b0;
+      color: #1B4D2E;
+      font-weight: 700;
+      font-size: 0.97rem;
+      padding: 0.95rem 1.5rem;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: background 0.18s ease, transform 0.14s ease, box-shadow 0.18s ease;
+      letter-spacing: 0.005em;
+    }
+
+    .cta:hover {
+      background: #a5d9a0;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(27, 77, 46, 0.18);
+    }
+
+    .cta:active { transform: translateY(0); box-shadow: none; }
+    .cta-arrow { font-size: 1.1rem; transition: transform 0.18s; }
+    .cta:hover .cta-arrow { transform: translateX(3px); }
+
+    .cta-note { text-align: center; font-size: 0.73rem; color: #a8b5ae; margin-top: 0.65rem; }
+
+    .disclaimer {
+      margin-top: 1.25rem;
+      font-size: 0.72rem;
+      color: #b5bfba;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 400px) {
+      .widget { padding: 1.75rem 1.1rem 1.5rem; }
+      h1 { font-size: 1.2rem; }
+      .pill-btn { font-size: 0.82rem; padding: 0.48rem 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="widget">
+
+  <div id="form-state">
+    <div class="header">
+      <h1>Find the right food for your dog's gut</h1>
+      <p class="subtitle">Tell us a bit about your dog to find out.</p>
+    </div>
+
+    <div class="inputs">
+
+      <div>
+        <span class="input-label">What do you feed them?</span>
+        <div class="pill-group">
+          <button class="pill-btn" data-group="food" data-value="kibble">Kibble</button>
+          <button class="pill-btn" data-group="food" data-value="wet">Wet food</button>
+          <button class="pill-btn" data-group="food" data-value="raw">Raw</button>
+          <button class="pill-btn" data-group="food" data-value="frozen">Frozen fresh</button>
+          <button class="pill-btn" data-group="food" data-value="mixed">Mixed</button>
+        </div>
+      </div>
+
+      <div>
+        <span class="input-label">How often do stomach issues come up?</span>
+        <div class="pill-group">
+          <button class="pill-btn" data-group="frequency" data-value="first">First time</button>
+          <button class="pill-btn" data-group="frequency" data-value="occasionally">Occasionally</button>
+          <button class="pill-btn" data-group="frequency" data-value="regularly">Regularly</button>
+        </div>
+      </div>
+
+      <div>
+        <span class="input-label">How old is your dog?</span>
+        <div class="pill-group">
+          <button class="pill-btn" data-group="age" data-value="puppy">Puppy</button>
+          <button class="pill-btn" data-group="age" data-value="adult">Adult</button>
+          <button class="pill-btn" data-group="age" data-value="senior">Senior</button>
+        </div>
+      </div>
+
+    </div>
+
+    <button class="generate-btn" id="generate-btn" disabled onclick="generateResult()">
+      Find out →
+    </button>
+  </div>
+
+  <div class="result" id="result">
+    <div class="result-card">
+      <p class="result-eyebrow">Your dog's gut profile</p>
+      <p class="result-text" id="result-text"></p>
+    </div>
+    <button class="result-reset" onclick="resetWidget()">Start again</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <a href="https://marleybones.com/pages/quiz?utm_source=widget&utm_medium=gut-health-checker&utm_campaign=cro-widgets"
+     class="cta" target="_top">
+    Create your personalised feeding plan
+    <span class="cta-arrow">→</span>
+  </a>
+  <p class="cta-note">Takes 2 minutes · Tailored to your dog</p>
+
+  <p class="disclaimer">
+    This is a general guide only. Always consult your vet for specific health concerns.
+  </p>
+
+</div>
+
+<script>
+  const RESPONSES = {
+    kibble: {
+      first: [
+        "A one-off upset on kibble is usually a passing irritation rather than a diet problem.",
+        "That said, fillers and heavy processing do make the gut work harder than necessary.",
+        "Fresh food like Marleybones is gentler on the stomach — gently cooked whole ingredients are easier to digest than heavily processed kibble."
+      ],
+      occasionally: [
+        "Occasional upsets on kibble are worth taking seriously — fillers and processed protein are common gut triggers.",
+        "Switching to fresh food with simple ingredients often makes a noticeable difference.",
+        "Fresh food like Marleybones — gently cooked, no fillers — is significantly easier to digest and a common reason owners see improvement."
+      ],
+      regularly: [
+        "Regular upsets on kibble strongly suggest diet is a factor — fillers and processed protein are hard on a sensitive gut.",
+        "Switching to fresh food with whole, simple ingredients is one of the most effective changes owners make.",
+        "Fresh food like Marleybones — gently cooked whole ingredients, no fillers or binders — is one of the most effective dietary changes for a sensitive gut."
+      ]
+    },
+    wet: {
+      first: [
+        "A single episode on wet food is most likely just a temporary irritation.",
+        "If it happens again, bulking agents and low-grade protein in wet food are worth looking at.",
+        "Gently cooked fresh food like Marleybones uses simpler, cleaner ingredients that are easier on the gut than most wet food."
+      ],
+      occasionally: [
+        "Occasional issues on wet food often come down to bulking agents and low-grade protein — harder on the gut than they look.",
+        "A fresh diet with fewer, cleaner ingredients tends to produce more consistent digestion.",
+        "Marleybones slow-cooks real meat and vegetables with no bulking agents — the kind of ingredients a sensitive gut can actually handle."
+      ],
+      regularly: [
+        "Regular episodes on wet food point strongly to ingredient quality — bulking agents and low-grade protein are common triggers.",
+        "A fresh diet with a short, clean ingredient list tends to produce a significant improvement.",
+        "Marleybones slow-cooks real meat and vegetables in the pack with nothing hidden — exactly the kind of clean, simple diet a sensitive gut needs."
+      ]
+    },
+    raw: {
+      first: [
+        "A one-off on raw is usually a new protein or temporary imbalance rather than a diet issue.",
+        "Raw done well is genuinely good for gut health.",
+        "Marleybones Pantry Fresh uses the same whole-food approach but gently cooked, which suits dogs whose guts prefer cooked protein."
+      ],
+      occasionally: [
+        "Occasional upsets on raw can point to protein rotation or a sensitivity to a specific ingredient.",
+        "If variability is a factor, a consistent fresh food recipe tends to help.",
+        "Marleybones Pantry Fresh uses the same whole-food philosophy but with a stable, consistent recipe that removes the variability."
+      ],
+      regularly: [
+        "Regular issues on raw suggest either a protein intolerance or a gut that responds better to lightly cooked food.",
+        "Some dogs genuinely do better on gently cooked fresh food than raw — it's not a failure of the approach.",
+        "Marleybones uses the same whole-food philosophy but gently cooked — often the right move for dogs whose guts prefer cooked protein."
+      ]
+    },
+    frozen: {
+      first: [
+        "One episode on frozen fresh is likely a one-off — you're already in a good place diet-wise.",
+        "Fresh food with simple ingredients is exactly what supports a healthy gut.",
+        "Marleybones works on the same principle as frozen fresh — just shelf-stable, no freezer needed."
+      ],
+      occasionally: [
+        "Occasional issues on frozen fresh suggest a specific ingredient might not be agreeing with your dog.",
+        "Rotating to a single protein and keeping the ingredient list short usually helps.",
+        "Marleybones has multiple single-protein recipes with short ingredient lists — makes it easier to find what works."
+      ],
+      regularly: [
+        "Regular problems on frozen fresh suggest a specific ingredient sensitivity rather than a general diet issue.",
+        "Identifying and eliminating the trigger — starting with a single novel protein — tends to help.",
+        "Marleybones has a short ingredient list and single-protein recipes — makes identifying and avoiding triggers much more straightforward."
+      ]
+    },
+    mixed: {
+      first: [
+        "A one-off on a mixed diet is hard to pin down — rotating foods can itself be a mild irritant.",
+        "Consistency tends to suit dogs with any digestive sensitivity.",
+        "Marleybones keeps the recipe simple and consistent, which helps a sensitive gut stay settled."
+      ],
+      occasionally: [
+        "Occasional problems on a mixed diet are often caused by the inconsistency itself.",
+        "Dogs with digestive sensitivity usually do better on one consistent, simple food.",
+        "Marleybones uses a consistent, short ingredient list — that predictability alone tends to make a meaningful difference."
+      ],
+      regularly: [
+        "Regular issues on a mixed diet almost always have diet as a factor — inconsistency is hard on a sensitive gut.",
+        "One consistent food with a short ingredient list is usually the most effective change.",
+        "Marleybones is built around exactly that — whole ingredients, one consistent recipe, nothing processed."
+      ]
+    }
+  };
+
+  const AGE_MODIFIERS = {
+    puppy:  "Puppies have developing gut microbiomes and are more vulnerable — getting the diet right early makes a real difference.",
+    senior: "Senior dogs have less gut resilience, so recurring digestive issues are worth addressing sooner rather than later."
+  };
+
+  let food      = null;
+  let frequency = null;
+  let age       = null;
+
+  document.querySelectorAll('.pill-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const group = btn.dataset.group;
+      const val   = btn.dataset.value;
+
+      document.querySelectorAll(`[data-group="${group}"]`)
+        .forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      if (group === 'food')      food      = val;
+      if (group === 'frequency') frequency = val;
+      if (group === 'age')       age       = val;
+
+      checkReady();
+    });
+  });
+
+  function checkReady() {
+    document.getElementById('generate-btn').disabled = !(food && frequency && age);
+  }
+
+  function generateResult() {
+    const sentences = [...RESPONSES[food][frequency]];
+    if (age !== 'adult') sentences[2] = AGE_MODIFIERS[age];
+
+    document.getElementById('result-text').textContent = sentences.join(' ');
+    document.getElementById('form-state').classList.add('hidden');
+    show('result');
+  }
+
+  function resetWidget() {
+    food = null; frequency = null; age = null;
+    document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('generate-btn').disabled = true;
+    hide('result');
+    document.getElementById('form-state').classList.remove('hidden');
+  }
+
+  function show(id) { document.getElementById(id).classList.add('visible'); }
+  function hide(id) { document.getElementById(id).classList.remove('visible'); }
+</script>
+
+</body>
+</html>

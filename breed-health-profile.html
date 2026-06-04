@@ -405,7 +405,7 @@
       // Trim at last sentence boundary under 450 chars
       let trimmed = '';
       for (const s of sentences) {
-        if ((trimmed + s).length <= 450) trimmed += s;
+        if ((trimmed + s).length <= 500) trimmed += s;
         else break;
       }
       text = (trimmed || sentences[0]).trim();

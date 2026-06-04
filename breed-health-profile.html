@@ -6,18 +6,17 @@
   <title>Breed Food Finder — Marleybones</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      background: #F5F0E8;
-      min-height: 100vh;
+      background: transparent;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
       padding: 1.25rem;
       overflow-x: hidden;
     }
-
+ 
     .widget {
       background: #ffffff;
       border-radius: 24px;
@@ -26,9 +25,9 @@
       width: 100%;
       box-shadow: 0 2px 20px rgba(27, 77, 46, 0.09), 0 0 0 1px rgba(27, 77, 46, 0.04);
     }
-
+ 
     .header { text-align: center; margin-bottom: 1.75rem; }
-
+ 
     .breed-tag {
       display: inline-block;
       background: #F5F0E8;
@@ -41,7 +40,7 @@
       border-radius: 50px;
       margin-bottom: 0.75rem;
     }
-
+ 
     h1 {
       font-size: 1.4rem;
       font-weight: 800;
@@ -49,21 +48,25 @@
       line-height: 1.2;
       letter-spacing: -0.01em;
     }
-
+ 
     .subtitle {
       margin-top: 0.5rem;
       font-size: 0.88rem;
       color: #7a9080;
       line-height: 1.5;
     }
-
+ 
+    /* ── Form state ── */
+    .form-state { display: block; }
+    .form-state.hidden { display: none; }
+ 
     .inputs {
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
       margin-bottom: 1.6rem;
     }
-
+ 
     .input-label {
       display: block;
       font-size: 0.92rem;
@@ -71,16 +74,16 @@
       color: #1B4D2E;
       margin-bottom: 0.7rem;
     }
-
+ 
     .input-hint {
       font-size: 0.78rem;
       color: #9aaa9e;
       font-weight: 400;
       margin-left: 0.4rem;
     }
-
+ 
     .pill-group { display: flex; flex-wrap: wrap; gap: 0.45rem; }
-
+ 
     .pill-btn {
       padding: 0.52rem 1rem;
       border-radius: 50px;
@@ -95,15 +98,10 @@
       white-space: nowrap;
       line-height: 1;
     }
-
+ 
     .pill-btn:hover { border-color: #1B4D2E; color: #1B4D2E; }
-
-    .pill-btn.active {
-      background: #1B4D2E;
-      border-color: #1B4D2E;
-      color: #ffffff;
-    }
-
+    .pill-btn.active { background: #1B4D2E; border-color: #1B4D2E; color: #ffffff; }
+ 
     .generate-btn {
       width: 100%;
       padding: 1rem 1.5rem;
@@ -117,44 +115,32 @@
       cursor: pointer;
       transition: background 0.15s ease, transform 0.14s ease, box-shadow 0.18s ease, opacity 0.15s ease;
       letter-spacing: 0.005em;
-      margin-bottom: 1.5rem;
     }
-
+ 
     .generate-btn:hover:not(:disabled) {
       background: #163d24;
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(27, 77, 46, 0.22);
     }
-
+ 
     .generate-btn:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
     .generate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .loading { display: none; text-align: center; padding: 1.6rem 1rem 1.2rem; }
-    .loading.visible { display: block; }
-    .loading-text { font-size: 0.88rem; color: #7a9080; margin-bottom: 0.7rem; }
-    .loading-dots { display: inline-flex; gap: 5px; }
-    .loading-dots span {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: #b8e0b0;
-      animation: bounce 1.1s infinite ease-in-out;
-    }
-    .loading-dots span:nth-child(2) { animation-delay: 0.18s; }
-    .loading-dots span:nth-child(3) { animation-delay: 0.36s; }
-    @keyframes bounce {
-      0%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-8px); }
-    }
-
-    .result { display: none; margin-bottom: 1.5rem; }
-    .result.visible { display: block; }
-
+ 
+    /* ── Result state ── */
+    .result-state { display: none; }
+    .result-state.visible { display: block; }
+ 
     .result-card {
       background: #F5F0E8;
       border-radius: 18px;
       padding: 1.4rem 1.3rem 1.25rem;
-      margin-bottom: 0.75rem;
+      margin-bottom: 1.6rem;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
-
+ 
     .result-eyebrow {
       font-size: 0.72rem;
       font-weight: 700;
@@ -163,42 +149,39 @@
       letter-spacing: 0.08em;
       margin-bottom: 0.6rem;
     }
-
+ 
     .result-text {
       font-size: 0.97rem;
       color: #1a3326;
       line-height: 1.75;
     }
-
-    .result-reset {
-      display: inline-block;
-      font-size: 0.77rem;
-      color: #9aaa9e;
-      cursor: pointer;
-      background: none;
-      border: none;
-      font-family: inherit;
-      padding: 0;
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-    .result-reset:hover { color: #1B4D2E; }
-
-    .error {
+ 
+    /* ── Loading inside result card ── */
+    .loading-inner {
       display: none;
-      background: #fff8f8;
-      border: 1.5px solid #f5c6c6;
-      border-radius: 12px;
-      padding: 0.9rem 1.1rem;
-      margin-bottom: 1.5rem;
-      font-size: 0.87rem;
-      color: #b94040;
-      line-height: 1.5;
+      text-align: center;
+      padding: 0.5rem 0;
     }
-    .error.visible { display: block; }
-
-    .divider { height: 1px; background: #EDE7DC; margin-bottom: 1.5rem; }
-
+ 
+    .loading-inner.visible { display: block; }
+ 
+    .loading-text { font-size: 0.88rem; color: #7a9080; margin-bottom: 0.7rem; }
+ 
+    .loading-dots { display: inline-flex; gap: 5px; }
+    .loading-dots span {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #b8e0b0;
+      animation: bounce 1.1s infinite ease-in-out;
+    }
+    .loading-dots span:nth-child(2) { animation-delay: 0.18s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.36s; }
+ 
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-8px); }
+    }
+ 
+    /* ── CTA ── */
     .cta {
       display: flex;
       align-items: center;
@@ -213,28 +196,59 @@
       text-decoration: none;
       transition: background 0.18s ease, transform 0.14s ease, box-shadow 0.18s ease;
       letter-spacing: 0.005em;
+      margin-bottom: 0.65rem;
     }
-
+ 
     .cta:hover {
       background: #a5d9a0;
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(27, 77, 46, 0.18);
     }
-
+ 
     .cta:active { transform: translateY(0); box-shadow: none; }
     .cta-arrow { font-size: 1.1rem; transition: transform 0.18s; }
     .cta:hover .cta-arrow { transform: translateX(3px); }
-
-    .cta-note { text-align: center; font-size: 0.73rem; color: #a8b5ae; margin-top: 0.65rem; }
-
+ 
+    .cta-note { text-align: center; font-size: 0.73rem; color: #a8b5ae; }
+ 
+    .result-reset {
+      display: block;
+      text-align: center;
+      font-size: 0.77rem;
+      color: #9aaa9e;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      padding: 0.65rem 0 0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      width: 100%;
+    }
+    .result-reset:hover { color: #1B4D2E; }
+ 
+    /* ── Error ── */
+    .error {
+      display: none;
+      background: #fff8f8;
+      border: 1.5px solid #f5c6c6;
+      border-radius: 12px;
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.87rem;
+      color: #b94040;
+      line-height: 1.5;
+    }
+    .error.visible { display: block; }
+ 
     .disclaimer {
-      margin-top: 1.25rem;
+      margin-top: 1rem;
       font-size: 0.72rem;
       color: #b5bfba;
       text-align: center;
       line-height: 1.5;
     }
-
+ 
     @media (max-width: 400px) {
       .widget { padding: 1.75rem 1.1rem 1.5rem; }
       h1 { font-size: 1.2rem; }
@@ -243,100 +257,104 @@
   </style>
 </head>
 <body>
-
+ 
 <div class="widget">
-
+ 
   <div class="header">
     <div class="breed-tag" id="breed-tag">Cockapoo</div>
     <h1 id="widget-title">Is fresh food right for your Cockapoo?</h1>
-    <p class="subtitle">Tell us a bit about your dog and we'll show you why.</p>
+    <p class="subtitle" id="widget-subtitle">Tell us a bit about your dog and we'll show you why.</p>
   </div>
-
-  <div class="inputs">
-
-    <div>
-      <span class="input-label">
-        Any health concerns?
-        <span class="input-hint">Pick as many as apply</span>
-      </span>
-      <div class="pill-group" id="concern-group">
-        <button class="pill-btn" data-group="concern" data-value="sensitive stomach or digestive issues">Sensitive stomach</button>
-        <button class="pill-btn" data-group="concern" data-value="itchy skin or allergies">Itchy skin</button>
-        <button class="pill-btn" data-group="concern" data-value="joint stiffness or mobility">Joint health</button>
-        <button class="pill-btn" data-group="concern" data-value="weight management">Weight</button>
-        <button class="pill-btn" data-group="concern" data-value="fussy eating">Fussy eater</button>
-        <button class="pill-btn" data-group="concern" data-value="no specific concerns">None right now</button>
+ 
+  <!-- FORM STATE -->
+  <div class="form-state" id="form-state">
+ 
+    <div class="inputs">
+      <div>
+        <span class="input-label">
+          Any health concerns?
+          <span class="input-hint">Pick as many as apply</span>
+        </span>
+        <div class="pill-group">
+          <button class="pill-btn" data-group="concern" data-value="sensitive stomach or digestive issues">Sensitive stomach</button>
+          <button class="pill-btn" data-group="concern" data-value="itchy skin or allergies">Itchy skin</button>
+          <button class="pill-btn" data-group="concern" data-value="joint stiffness or mobility">Joint health</button>
+          <button class="pill-btn" data-group="concern" data-value="weight management">Weight</button>
+          <button class="pill-btn" data-group="concern" data-value="fussy eating">Fussy eater</button>
+          <button class="pill-btn" data-group="concern" data-value="no specific concerns">None right now</button>
+        </div>
+      </div>
+ 
+      <div>
+        <span class="input-label">What are they eating now?</span>
+        <div class="pill-group">
+          <button class="pill-btn" data-group="food" data-value="dry kibble">Kibble</button>
+          <button class="pill-btn" data-group="food" data-value="wet food">Wet food</button>
+          <button class="pill-btn" data-group="food" data-value="raw food">Raw</button>
+          <button class="pill-btn" data-group="food" data-value="frozen fresh food">Frozen fresh</button>
+          <button class="pill-btn" data-group="food" data-value="a mix of different foods">Mixed</button>
+        </div>
       </div>
     </div>
-
-    <div>
-      <span class="input-label">What are they eating now?</span>
-      <div class="pill-group" id="food-group">
-        <button class="pill-btn" data-group="food" data-value="dry kibble">Kibble</button>
-        <button class="pill-btn" data-group="food" data-value="wet food">Wet food</button>
-        <button class="pill-btn" data-group="food" data-value="raw food">Raw</button>
-        <button class="pill-btn" data-group="food" data-value="frozen fresh food">Frozen fresh</button>
-        <button class="pill-btn" data-group="food" data-value="a mix of different foods">Mixed</button>
+ 
+    <button class="generate-btn" id="generate-btn" disabled onclick="generateProfile()">
+      Find the right food for your Cockapoo →
+    </button>
+ 
+  </div>
+ 
+  <!-- RESULT STATE -->
+  <div class="result-state" id="result-state">
+ 
+    <div class="result-card" id="result-card">
+      <div class="loading-inner" id="loading-inner">
+        <p class="loading-text">Finding your recommendation</p>
+        <div class="loading-dots"><span></span><span></span><span></span></div>
       </div>
-    </div>
-
-  </div>
-
-  <button class="generate-btn" id="generate-btn" disabled onclick="generateProfile()">
-    Find the right food for your Cockapoo →
-  </button>
-
-  <div class="loading" id="loading">
-    <p class="loading-text">Finding your recommendation</p>
-    <div class="loading-dots"><span></span><span></span><span></span></div>
-  </div>
-
-  <div class="result" id="result">
-    <div class="result-card">
       <p class="result-eyebrow" id="result-eyebrow">Your Cockapoo's profile</p>
       <p class="result-text" id="result-text"></p>
     </div>
+ 
+    <div class="error" id="error">
+      Something went wrong — please try again in a moment.
+    </div>
+ 
+    <a href="https://marleybones.com/pages/quiz?utm_source=widget&utm_medium=breed-health-profile&utm_campaign=cro-widgets"
+       class="cta" target="_top">
+      Create your personalised feeding plan
+      <span class="cta-arrow">→</span>
+    </a>
+    <p class="cta-note" id="cta-note">Takes 2 minutes · Tailored to your Cockapoo</p>
+ 
     <button class="result-reset" onclick="resetWidget()">Start again</button>
+ 
   </div>
-
-  <div class="error" id="error">
-    Something went wrong — please try again in a moment.
-  </div>
-
-  <div class="divider"></div>
-
-  <a href="https://marleybones.com/pages/quiz?utm_source=widget&utm_medium=breed-health-profile&utm_campaign=cro-widgets"
-     class="cta" target="_top">
-    Create your personalised feeding plan
-    <span class="cta-arrow">→</span>
-  </a>
-  <p class="cta-note" id="cta-note">Takes 2 minutes · Tailored to your Cockapoo</p>
-
+ 
   <p class="disclaimer">
     This is a general guide only. Always consult your vet for specific health concerns.
   </p>
-
+ 
 </div>
-
+ 
 <script>
   const params   = new URLSearchParams(window.location.search);
   const rawBreed = params.get('breed') || 'Cockapoo';
   const breed    = rawBreed.charAt(0).toUpperCase() + rawBreed.slice(1);
-
+ 
   document.getElementById('breed-tag').textContent      = breed;
   document.getElementById('widget-title').textContent   = `Is fresh food right for your ${breed}?`;
   document.getElementById('result-eyebrow').textContent = `Your ${breed}'s profile`;
-  document.getElementById('generate-btn').textContent   = `Find the right food for your ${breed} →`;
-  document.getElementById('cta-note').textContent       = `Takes 2 minutes · Tailored to your ${breed}`;
-
+  document.getElementById('generate-btn').textContent   = `Find the right food for your ${breed} \u2192`;
+  document.getElementById('cta-note').textContent       = `Takes 2 minutes \u00b7 Tailored to your ${breed}`;
+ 
   const concerns = new Set();
   let food = null;
-
+ 
   document.querySelectorAll('.pill-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const group = btn.dataset.group;
       const val   = btn.dataset.value;
-
+ 
       if (group === 'concern') {
         if (val === 'no specific concerns') {
           concerns.clear();
@@ -362,72 +380,76 @@
         btn.classList.add('active');
         food = val;
       }
-
-      checkReady();
+ 
+      document.getElementById('generate-btn').disabled = !(concerns.size > 0 && food);
     });
   });
-
-  function checkReady() {
-    document.getElementById('generate-btn').disabled = !(concerns.size > 0 && food);
-  }
-
+ 
   async function generateProfile() {
-    const btn = document.getElementById('generate-btn');
-    btn.disabled = true;
-    show('loading'); hide('result'); hide('error');
-
+    // Swap to result state immediately — shows loading inside result card
+    document.getElementById('form-state').classList.add('hidden');
+    document.getElementById('result-state').classList.add('visible');
+    document.getElementById('loading-inner').classList.add('visible');
+    document.getElementById('result-eyebrow').style.display = 'none';
+    document.getElementById('result-text').style.display = 'none';
+    hide('error');
+ 
     const concernList = [...concerns].join(' and ');
-
-    const userPrompt = `Breed: ${breed}
-Health concern(s): ${concernList}
-Currently eating: ${food}
-
-Write 2 to 3 concise sentences for this dog owner. Lead with the benefit. Be specific to the breed. Total response under 400 characters.`;
-
+ 
+    const systemPrompt = `You are a dog nutrition expert explaining something to a friend — confident and clear, but not clinical or salesy. Think of how a vet friend would explain something at a dinner party: direct, specific, no jargon, no waffle.\n\nThe person has already read that fresh dog food is generally better than kibble. They want to know if it is specifically right for their dog. Your job is to give them a clear, honest reason why fresh food makes sense for this particular breed given their situation, and why Marleybones specifically delivers that.\n\nRules:\n- Write exactly 2 to 3 sentences. No more.\n- Each sentence must be short and punchy — maximum 150 characters per sentence, hard limit. If a sentence needs a comma or a dash to keep going, split it into two sentences instead. Three short clear sentences are always better than two long ones.\n- Lead immediately with why fresh food helps for this breed and these concerns. Do not open with the problem — open with the benefit or the reason it works.\n- Be specific to this breed's known health tendencies. Avoid generic claims that apply to any dog.\n- Confident and clear in tone — not casual, not clinical, not salesy.\n- No marketing language, no superlatives, no stats, no exclamation marks.\n- Always end with a point about Marleybones — either as a standalone sentence or as the second half of the final sentence, whichever feels more natural. It should state one specific relevant fact about Marleybones Pantry Fresh that completes the thought. It should feel like the natural conclusion to what came before it, not a separate sales point tacked on the end. Never phrase it as a suggestion to check it out, explore it, or that it is worth a look.\n- The Marleybones fact must be relevant to what they are currently feeding. Use this mapping: kibble means the contrast is real ingredients versus processed meal, real meat slow-cooked rather than extruded at high heat; wet food means ingredient quality and no fillers or bulking agents; raw means consistent nutrient profile because it is vet-developed and FEDIAF compliant, food safety, no handling complexity, no prep or freezer needed — do not claim it is simpler or more digestible than raw; frozen fresh means same principle as what they are already feeding but shelf-stable with no freezer needed; mixed means consistency of ingredients, knowing exactly what is in every meal. Never mention shelf-stable or no freezer to someone who is not on frozen fresh — it is irrelevant to them.\n\nConcern-specific guidance:\n\nFUSSY EATING: The reason fresh food works for fussy dogs is palatability — it smells and tastes like real food in a way that processed food does not. Lead with this. Explain that the aroma and taste of real meat and vegetables is what makes the difference for dogs that turn their nose up at processed food.\n\nSENSITIVE STOMACH: Fresh food removes the fillers, binding agents, and heavily processed ingredients that are common triggers. Mention the breed's specific digestive tendencies if known. Explain that simpler, more digestible ingredients reduce the load on the gut.\n\nITCHY SKIN OR ALLERGIES: The mechanism is ingredient transparency — fresh food makes it easier to identify and rotate proteins, avoiding common triggers. Many skin reactions in dogs are food-related and linked to additives or low-quality protein sources in processed food.\n\nFROZEN FRESH: Acknowledge they are already in the right place nutritionally. Explain that Pantry Fresh works on the same principle but is shelf-stable with no freezer needed. This is the most natural context to mention the no-freezer benefit.\n\nJOINT HEALTH: Fresh food with natural anti-inflammatory ingredients supports joint health better than processed food. Mention the breed's known joint tendencies if relevant.\n\nWEIGHT MANAGEMENT: Fresh food has better moisture content and more accurate traceable calorie density than kibble, making portion control more straightforward.\n\nRAW: Raw feeders have already committed to real ingredients and quality protein — do not claim fresh food is simpler or more digestible than raw as this is not accurate and will lose credibility. The relevant Marleybones angle is consistent nutrient profile because it is vet-developed and FEDIAF compliant, food safety, no handling complexity, and no prep or freezer needed. Do not overclaim.`;
+ 
+    const userPrompt = `Breed: ${breed}\nHealth concern(s): ${concernList}\nCurrently eating: ${food}\n\nWrite 2 to 3 short punchy sentences for this dog owner. Each sentence under 150 characters. Lead with the benefit. Be specific to the breed.`;
+ 
     try {
       const res = await fetch('https://marleybones-widget-proxy.ehatzi.workers.dev', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          system: systemPrompt,
           messages: [{ role: 'user', content: userPrompt }]
         })
       });
-
+ 
       if (!res.ok) throw new Error(res.status);
-
+ 
       const data = await res.json();
       let text = data.content
         .filter(b => b.type === 'text')
         .map(b => b.text)
         .join(' ')
         .trim();
-
-      // Hard trim to 3 sentences as safety net
+ 
+      // Hard trim to 3 sentences
       const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
       text = sentences.slice(0, 3).join(' ').trim();
-
+ 
+      document.getElementById('loading-inner').classList.remove('visible');
+      document.getElementById('result-eyebrow').style.display = '';
+      document.getElementById('result-text').style.display = '';
       document.getElementById('result-text').textContent = text;
-      show('result');
-
+ 
     } catch (err) {
       console.error(err);
+      document.getElementById('loading-inner').classList.remove('visible');
       show('error');
-      btn.disabled = false;
-    } finally {
-      hide('loading');
     }
   }
-
+ 
   function resetWidget() {
     concerns.clear();
     food = null;
     document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-    hide('result'); hide('error');
     document.getElementById('generate-btn').disabled = true;
+    document.getElementById('result-text').textContent = '';
+    document.getElementById('result-state').classList.remove('visible');
+    document.getElementById('form-state').classList.remove('hidden');
+    hide('error');
   }
-
+ 
   function show(id) { document.getElementById(id).classList.add('visible'); }
   function hide(id) { document.getElementById(id).classList.remove('visible'); }
 </script>
-
+ 
 </body>
 </html>
+ 

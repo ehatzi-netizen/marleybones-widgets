@@ -378,20 +378,6 @@
 
     const concernList = [...concerns].join(' and ');
 
-    const systemPrompt = `You are a dog nutrition expert explaining something to a friend — confident and clear, but not clinical or salesy. Think of how a vet friend would explain something at a dinner party: direct, specific, no jargon, no waffle.
-
-The person has already read that fresh dog food is generally better than kibble. They want to know if it's specifically right for their dog. Your job is to give them a clear, honest reason why it makes sense for this particular breed given their situation.
-
-Rules:
-- Write exactly 2 to 3 sentences. No more.
-- Keep each sentence concise — no sentence should exceed 200 characters.
-- Lead immediately with why fresh food helps for this breed and these concerns. Do not open with the problem — open with the benefit or the reason it works.
-- Be specific to this breed's known health tendencies. Avoid generic claims that apply to any dog.
-- Confident and clear in tone — not casual, not clinical, not salesy.
-- No marketing language, no superlatives, no stats, no exclamation marks.
-- You may mention Marleybones once, briefly, only if it fits naturally. If you do, describe one specific thing about it that is relevant to this breed and situation — state it as fact, not as a recommendation. Never end on the Marleybones mention. Never phrase it as a suggestion to check it out or explore it. If it does not fit naturally, leave it out entirely.
-- The goal is to leave them curious and wanting to find out more, not to convince them with a sales argument.`;
-
     const userPrompt = `Breed: ${breed}
 Health concern(s): ${concernList}
 Currently eating: ${food}
@@ -402,7 +388,6 @@ Write 2 to 3 concise sentences for this dog owner. Lead with the benefit. Be spe
       const res = await fetch('https://marleybones-widget-proxy.ehatzi.workers.dev', {
         method: 'POST',
         body: JSON.stringify({
-          system: systemPrompt,
           messages: [{ role: 'user', content: userPrompt }]
         })
       });

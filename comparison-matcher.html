@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fresh Food Matcher, Marleybones</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: transparent;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 1.25rem;
+      overflow-x: hidden;
+      min-height: 420px;
+    }
+
+    .widget {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 2.25rem 2rem 2rem;
+      max-width: 580px;
+      width: 100%;
+      box-shadow: 0 2px 20px rgba(27, 77, 46, 0.09), 0 0 0 1px rgba(27, 77, 46, 0.04);
+    }
+
+    /* Progress */
+    .steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      margin-bottom: 1.4rem;
+    }
+    .step-dot {
+      height: 6px;
+      border-radius: 50px;
+      background: #E4DED2;
+      transition: background 0.25s ease, width 0.25s ease;
+      width: 26px;
+    }
+    .step-dot.active { background: #1B4D2E; width: 40px; }
+    .step-dot.done { background: #b8e0b0; }
+    .step-label {
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #7a9080;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.55rem;
+    }
+
+    /* Panels */
+    .panel { display: none; }
+    .panel.active { display: block; animation: fade 0.28s ease; }
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .q-title {
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #1B4D2E;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+    .q-title:focus { outline: none; }
+
+    .q-sub {
+      text-align: center;
+      margin-top: 0.5rem;
+      font-size: 0.88rem;
+      color: #7a9080;
+      line-height: 1.5;
+    }
+
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.55rem;
+      margin-top: 1.6rem;
+    }
+
+    .pill-btn {
+      flex: 1 1 auto;
+      min-width: 96px;
+      max-width: 170px;
+      padding: 0.85rem 1.1rem;
+      border-radius: 50px;
+      border: 2px solid #D8D0C4;
+      background: #ffffff;
+      color: #4a6555;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, transform 0.14s ease;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .pill-btn:hover { border-color: #1B4D2E; color: #1B4D2E; transform: translateY(-2px); }
+    .pill-btn.active { background: #1B4D2E; border-color: #1B4D2E; color: #ffffff; }
+    .pill-btn:focus-visible {
+      outline: 3px solid #b8e0b0;
+      outline-offset: 2px;
+      border-color: #1B4D2E;
+    }
+
+    .back-btn {
+      display: block;
+      margin: 1.6rem auto 0;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #9aaa9e;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      padding: 0.5rem 0.9rem;
+      border-radius: 50px;
+    }
+    .back-btn:hover { color: #1B4D2E; }
+    .back-btn:focus-visible { outline: 3px solid #b8e0b0; outline-offset: 2px; color: #1B4D2E; }
+
+    /* Result */
+    .result-card {
+      background: #F5F0E8;
+      border-radius: 18px;
+      padding: 1.6rem 1.4rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .answer-chip {
+      display: inline-block;
+      background: #ffffff;
+      color: #1B4D2E;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.35rem 0.8rem;
+      border-radius: 50px;
+      margin-bottom: 0.9rem;
+      box-shadow: 0 0 0 1px rgba(27, 77, 46, 0.08);
+    }
+    .result-heading {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #1B4D2E;
+      line-height: 1.22;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.7rem;
+    }
+    .result-text {
+      font-size: 0.97rem;
+      color: #1a3326;
+      line-height: 1.7;
+      white-space: pre-line;      /* renders the \n\n paragraph break in the response copy */
+    }
+
+    .lead-in {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #4a6555;
+      line-height: 1.55;
+      margin-bottom: 1.1rem;
+    }
+
+    .cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      background: #b8e0b0;
+      color: #1B4D2E;
+      font-weight: 700;
+      font-size: 0.97rem;
+      padding: 1rem 1.5rem;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: background 0.18s ease, transform 0.14s ease, box-shadow 0.18s ease;
+      letter-spacing: 0.005em;
+      margin-bottom: 0.65rem;
+    }
+    .cta:hover {
+      background: #a5d9a0;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(27, 77, 46, 0.18);
+    }
+    .cta:active { transform: translateY(0); box-shadow: none; }
+    .cta:focus-visible { outline: 3px solid #1B4D2E; outline-offset: 3px; }
+    .cta-arrow { font-size: 1.1rem; transition: transform 0.18s; }
+    .cta:hover .cta-arrow { transform: translateX(3px); }
+
+    .cta-note { text-align: center; font-size: 0.73rem; color: #a8b5ae; margin-bottom: 0.2rem; }
+
+    .result-reset {
+      display: block;
+      text-align: center;
+      font-size: 0.77rem;
+      color: #9aaa9e;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      padding: 0.65rem 0 0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      width: 100%;
+    }
+    .result-reset:hover { color: #1B4D2E; }
+    .result-reset:focus-visible { outline: 3px solid #b8e0b0; outline-offset: 2px; color: #1B4D2E; }
+
+    @media (max-width: 400px) {
+      .widget { padding: 1.75rem 1.1rem 1.5rem; }
+      .q-title { font-size: 1.2rem; }
+      .result-heading { font-size: 1.18rem; }
+      .pill-btn { font-size: 0.9rem; padding: 0.8rem 0.9rem; min-width: 84px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .panel.active { animation: none; }
+      .pill-btn, .cta, .step-dot { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="widget">
+
+  <!-- Progress -->
+  <div class="steps" aria-hidden="true">
+    <span class="step-dot" id="dot-1"></span>
+    <span class="step-dot" id="dot-2"></span>
+    <span class="step-dot" id="dot-3"></span>
+  </div>
+  <p class="step-label" id="step-label">Step 1 of 2</p>
+
+  <!-- Step 1: CURRENT FOOD -->
+  <section class="panel active" id="panel-1" role="group" aria-labelledby="title-1">
+    <h1 class="q-title" id="title-1" tabindex="-1">What are you feeding right now?</h1>
+    <p class="q-sub">Two quick taps to see if Marleybones is right for your dog.</p>
+    <div class="pill-group" id="group-1" role="group" aria-label="What are you feeding right now?"></div>
+  </section>
+
+  <!-- Step 2: THE MAIN THING -->
+  <section class="panel" id="panel-2" role="group" aria-labelledby="title-2">
+    <h1 class="q-title" id="title-2" tabindex="-1">And what's top of your list?</h1>
+    <p class="q-sub">Last one, then the good bit.</p>
+    <div class="pill-group" id="group-2" role="group" aria-label="And what's top of your list?"></div>
+    <button class="back-btn" type="button" onclick="goToStep(1)">&larr; Back</button>
+  </section>
+
+  <!-- Result -->
+  <section class="panel" id="panel-result" aria-labelledby="result-heading">
+    <div class="result-card">
+      <span class="answer-chip" id="answer-chip"></span>
+      <h1 class="result-heading" id="result-heading" tabindex="-1"></h1>
+      <p class="result-text" id="result-text"></p>
+    </div>
+
+    <p class="lead-in">Build your dog their own personalised Marleybones feeding and health plan, tailored to their age, size, and health requirements.</p>
+
+    <a href="#" class="cta" id="cta-link" target="_top">
+      Build their plan
+      <span class="cta-arrow" aria-hidden="true">&rarr;</span>
+    </a>
+    <p class="cta-note">Takes about 2 minutes</p>
+
+    <button class="result-reset" type="button" onclick="resetWidget()">Start again</button>
+  </section>
+
+</div>
+
+<script>
+  /* =========================================================================
+     CONFIG, everything per-variant lives here.
+     Each variant has: utm_campaign, resultHeading, and its own `responses`
+     matrix (a bespoke result body for every current-food x main-thing combo).
+     To add a variant later, copy a block and write its responses.
+     Select a variant with ?variant=<key> in the iframe URL.
+
+     NOTE: bestofboth (Butternut vs Lily's Kitchen) copy is still to be written.
+     For now it falls back to the freezer responses so the page never breaks.
+     ========================================================================= */
+  const CONFIG = {
+    freezer: {                                   // Butternut vs Different Dog (fresh vs fresh)
+      utm_campaign: 'bb-vs-dd-matcher',
+      resultHeading: 'Fresh food, without the freezer',
+      responses: {
+        kibble: {
+          fussy:   "If dry food is getting sniffed at and left, the smell of a real, properly cooked meal is usually what changes a fussy dog's mind.\n\nMarleybones delivers the real aroma and taste of freshly prepared meat or fish, gently cooked in the pack, without the processing that turns dogs off their bowl.",
+          stomach: "Kibble is convenient, but for a sensitive stomach a short list of gently cooked, real ingredients tends to be the gentler option.\n\nMarleybones is genuinely fresh food, gently cooked in the pack from a handful of real ingredients, with no fillers to upset a sensitive gut.",
+          faff:    "Kibble wins on ease, and the good news is that real fresh food can be just as simple to store and serve, straight from the cupboard.\n\nMarleybones is genuinely fresh food that's shelf-stable. Gently cooked and sealed in the pack, it lives in the cupboard like your kibble and serves straight from the carton. No freezer, no prep.",
+          better:  "Moving on from dry food is really about what dinner is made of, real meat and vegetables rather than dried pellets.\n\nMarleybones is 60% freshly prepared meat or fish with veggies and superfoods, gently cooked in the pack. No fillers, no processing, nothing dried into a pellet."
+        },
+        wet: {
+          fussy:   "Your dog already likes food that smells like a meal, and fresh cooking leans right into that, with better meat and vegetables behind the aroma.\n\nMarleybones delivers the real aroma and taste of freshly prepared meat or fish, gently cooked in the pack, with far more real meat than the jelly and gravy that bulk out most tins.",
+          stomach: "Wet food is easy to eat, and fresh food keeps that while sticking to a short list of real ingredients that tend to sit well.\n\nMarleybones is genuinely fresh food, gently cooked in the pack, with no gums, gels or fillers to unsettle a sensitive stomach.",
+          faff:    "Wet food is simple enough day to day, and fresh food matches it for ease, real meals that store neatly and serve straight from the pack.\n\nMarleybones is genuinely fresh food that's shelf-stable. Gently cooked and sealed in the pack, it lives in the cupboard and serves straight from the carton. Same open-and-go ease, far more real meat.",
+          better:  "Wet food is already a step up from dry, and fresh is the next one, real meat and vegetables rather than a tin bulked out with gravy.\n\nMarleybones is 60% freshly prepared meat or fish with veggies and superfoods, gently cooked in the pack. Real ingredients you can see, not a tin padded out with jelly."
+        },
+        frozenfresh: {
+          fussy:   "A fussy dog on frozen fresh already loves a proper meal, and this is that same real food without the freezer full of trays.\n\nMarleybones is that same proper meal, 60% freshly prepared meat or fish gently cooked in the pack. Just as fresh, only shelf-stable, so it lives in the cupboard, not the freezer.",
+          stomach: "You are already feeding fresh, so for a sensitive stomach the win is keeping those simple real ingredients while losing the freezer routine.\n\nMarleybones is the same gently cooked fresh food, the same short list of real ingredients, minus the freezer. Shelf-stable in the cupboard, and just as gentle.",
+          faff:    "You are already feeding fresh, so the food is sorted, it is the freezer space and the nightly defrost that get old.\n\nMarleybones is the same fresh food, gently cooked in the pack, but shelf-stable. It lives in the cupboard and serves straight from the carton. No freezer, no defrosting, no planning a meal ahead.",
+          better:  "You have already chosen fresh, which is the better bowl sorted, so the only thing left to upgrade is needing a freezer to keep it.\n\nMarleybones matches it: 60% freshly prepared meat or fish with veggies and superfoods, gently cooked in the pack. Same quality bowl, just shelf-stable in the cupboard, no freezer needed."
+        },
+        freezedried: {
+          fussy:   "Freeze dried is handy, but a fussy dog often perks up more for food that is gently cooked and served as a warm, real meal, not rehydrated.\n\nMarleybones delivers the real aroma and taste of freshly prepared meat or fish, gently cooked in the pack and served properly moist, with nothing to rehydrate.",
+          stomach: "Freeze dried keeps things simple, and fresh food offers a similar short, real ingredient list for a sensitive stomach, with no rehydrating first.\n\nMarleybones is fresh, moist food, gently cooked in the pack from a short list of real ingredients. Nothing to rehydrate, and nothing harsh for a sensitive gut.",
+          faff:    "Freeze dried already skips the freezer, and fresh food keeps that cupboard convenience while serving as a proper meal, with no water to add or wait for.\n\nMarleybones is shelf-stable and serves straight from the carton, gently cooked in the pack as properly fresh, moist food. No water to add, no waiting.",
+          better:  "Freeze dried trades a little real-meal quality for shelf life, and fresh food gives you real meat, vegetables and superfoods without that trade.\n\nMarleybones is 60% freshly prepared meat or fish with veggies and superfoods, gently cooked in the pack. Fresh and moist, no drying, no fillers."
+        },
+        homecooked: {
+          fussy:   "You already cook real food, so you know a fussy dog eats what smells right, and fresh food keeps that real-meal appeal without you at the stove.\n\nMarleybones delivers that same real aroma and taste, 60% freshly prepared meat or fish gently cooked in the pack, without you standing over the stove for it.",
+          stomach: "Home cooking gives you control over a sensitive stomach, and fresh food keeps that short, real ingredient list while taking the balancing off your plate.\n\nMarleybones is genuinely fresh food, gently cooked in the pack from a short list of real ingredients, and vet-developed so it's complete as well as gentle.",
+          faff:    "Home cooking is the real deal but it takes real time, and fresh food is that same real food, portioned and ready, with none of the prep.\n\nMarleybones is that same real, fresh food, gently cooked in the pack and portioned ready to serve. Shelf-stable in the cupboard, with none of the shopping, prep or cooking.",
+          better:  "You are already sold on real food, and the draw of fresh is keeping that quality while a vet developed recipe makes sure it is complete.\n\nMarleybones is 60% freshly prepared meat or fish with veggies and superfoods, gently cooked in the pack and vet-developed to be complete, so nothing's missing from the bowl."
+        }
+      }
+    },
+    bestofboth: {                                // Butternut vs Lily's Kitchen (fresh vs packaged)
+      utm_campaign: 'bb-vs-lk-matcher',
+      resultHeading: 'Fresh food that lives in the cupboard',
+      responses: null                            // TODO: write bespoke best-of-both copy; falls back to freezer for now
+    }
+  };
+
+  // Shared across every variant.
+  const QUIZ_URL = 'https://marleybones.com/pages/quiz';
+
+  // Two taps: what they feed now, then the main thing on their mind.
+  const QUESTIONS = {
+    q1: {   // current food
+      options: [
+        { key: 'kibble',      label: 'Kibble' },
+        { key: 'wet',         label: 'Wet food' },
+        { key: 'frozenfresh', label: 'Frozen fresh' },
+        { key: 'freezedried', label: 'Freeze dried' },
+        { key: 'homecooked',  label: 'Home-cooked' }
+      ]
+    },
+    q2: {   // the main thing
+      options: [
+        { key: 'fussy',   label: 'Fussy eater' },
+        { key: 'stomach', label: 'Sensitive stomach' },
+        { key: 'faff',    label: 'Less faff' },
+        { key: 'better',  label: 'Just better food' }
+      ]
+    }
+  };
+
+  /* ========================================================================= */
+
+  const DEFAULT_VARIANT = 'freezer';
+  const params      = new URLSearchParams(window.location.search);
+  const variantKey  = CONFIG[params.get('variant')] ? params.get('variant') : DEFAULT_VARIANT;
+  const variant     = CONFIG[variantKey];
+
+  const answers = { q1: null, q2: null };   // stores { key, label } per question
+
+  // Build the pill buttons for a question.
+  function buildPills(groupId, question, onPick) {
+    const group = document.getElementById(groupId);
+    question.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pill-btn';
+      btn.textContent = opt.label;
+      btn.setAttribute('aria-label', opt.label);
+      btn.addEventListener('click', () => onPick(opt, btn, group));
+      group.appendChild(btn);
+    });
+  }
+
+  function markActive(group, btn) {
+    group.querySelectorAll('.pill-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
+  }
+
+  buildPills('group-1', QUESTIONS.q1, (opt, btn, group) => {
+    answers.q1 = opt;
+    markActive(group, btn);
+    setTimeout(() => goToStep(2), 180);          // auto-advance: keeps the two-tap momentum
+  });
+
+  buildPills('group-2', QUESTIONS.q2, (opt, btn, group) => {
+    answers.q2 = opt;
+    markActive(group, btn);
+    setTimeout(showResult, 180);
+  });
+
+  const panels = {
+    1: document.getElementById('panel-1'),
+    2: document.getElementById('panel-2'),
+    result: document.getElementById('panel-result')
+  };
+  const dots = [null, document.getElementById('dot-1'), document.getElementById('dot-2'), document.getElementById('dot-3')];
+
+  function setPanel(name) {
+    Object.values(panels).forEach(p => p.classList.remove('active'));
+    panels[name].classList.add('active');
+  }
+
+  function setProgress(stage) {                  // stage: 1, 2, or 3 (result)
+    document.getElementById('step-label').textContent =
+      stage === 3 ? 'Your match' : 'Step ' + stage + ' of 2';
+    dots.forEach((d, i) => {
+      if (!d) return;
+      d.classList.toggle('active', i === stage);
+      d.classList.toggle('done', i < stage);
+    });
+  }
+
+  function goToStep(step) {
+    setPanel(step);
+    setProgress(step);
+    document.getElementById('title-' + step).focus();
+  }
+
+  function showResult() {
+    const responses = variant.responses || CONFIG.freezer.responses;   // bestofboth falls back until its copy is written
+    const body = responses[answers.q1.key][answers.q2.key];
+
+    document.getElementById('answer-chip').textContent = answers.q1.label + ' · ' + answers.q2.label;
+    document.getElementById('result-heading').textContent = variant.resultHeading;
+    document.getElementById('result-text').textContent = body;
+
+    const utms = '?utm_source=blog&utm_medium=widget&utm_campaign=' + variant.utm_campaign;
+    document.getElementById('cta-link').setAttribute('href', QUIZ_URL + utms);
+
+    setPanel('result');
+    setProgress(3);
+    document.getElementById('result-heading').focus();
+  }
+
+  function resetWidget() {
+    answers.q1 = null;
+    answers.q2 = null;
+    document.querySelectorAll('.pill-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
+    goToStep(1);
+  }
+
+  // Initialise
+  setProgress(1);
+</script>
+
+</body>
+</html>
